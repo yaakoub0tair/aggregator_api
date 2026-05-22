@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('scraping_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('scraping_job_id')->constrained('scraping_jobs')->cascadeOnDelete();
-        $table->integer('articles_found')->default(0);
-        $table->integer('articles_saved')->default(0);
-        $table->text('error_message')->nullable();
+            $table->integer('articles_found')->default(0);
+            $table->integer('articles_saved')->default(0);
+            $table->text('error_message')->nullable();
             $table->timestamps();
         });
     }

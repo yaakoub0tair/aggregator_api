@@ -1,59 +1,219 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# News Aggregator API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust Laravel-based REST API for aggregating news articles from multiple Moroccan news sources with automated scraping capabilities.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Multi-source News Aggregation**: Scrape articles from multiple news sources (Hespress, Hibapress)
+- **Automated Daily Scraping**: Scheduled jobs to automatically fetch new articles daily
+- **RESTful API**: Clean, well-documented API endpoints for all operations
+- **Authentication**: Secure API authentication using Laravel Sanctum
+- **Admin Dashboard**: Protected endpoints for content management and analytics
+- **Rate Limiting**: Built-in rate limiting for public endpoints (60 requests/minute)
+- **Search Functionality**: Full-text search across articles
+- **Category Management**: Organize articles by categories
+- **Source Management**: Enable/disable news sources dynamically
+- **Queue-based Processing**: Asynchronous scraping jobs for better performance
+-Duplicate Detection**: Automatic duplicate article prevention
+- **Pagination**: Efficient data retrieval with pagination
+- **API Documentation**: OpenAPI/Swagger documentation support
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Framework**: Laravel 11
+- **PHP**: 8.2+
+- **Database**: MySQL/PostgreSQL
+- **Authentication**: Laravel Sanctum
+- **Queue**: Redis/Database
+- **HTTP Client**: Guzzle
+- **Web Scraping**: Symfony DomCrawler
+- **API Documentation**: L5-Swagger
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Prerequisites
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.2 or higher
+- Composer
+- MySQL or PostgreSQL
+- Redis (optional, for queue)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Setup
 
-## Agentic Development
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yaakoub0tair/aggregator_api.git
+   cd aggregator_api
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+2. **Install dependencies**
+   ```bash
+   composer install
+   ```
 
+3. **Environment configuration**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configure database**
+   Edit `.env` file with your database credentials:
+   ```env
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+5. **Run migrations**
+   ```bash
+   php artisan migrate
+   ```
+
+6. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/register` - Register new user
+- `POST /api/login` - Login user
+- `POST /api/logout` - Logout user (authenticated)
+- `GET /api/me` - Get current user (authenticated)
+
+### Public Endpoints (Rate Limited: 60/min)
+
+- `GET /api/articles` - List all articles (paginated)
+- `GET /api/articles/{slug}` - Get single article by slug
+- `GET /api/search` - Search articles
+- `GET /api/categories` - List all categories
+- `GET /api/sources` - List all news sources
+
+### Admin Endpoints (Authenticated + Admin Role)
+
+#### Articles
+- `POST /api/articles` - Create article
+- `DELETE /api/articles/{article}` - Delete article
+
+#### Categories
+- `POST /api/categories` - Create category
+- `PUT /api/categories/{category}` - Update category
+- `DELETE /api/categories/{category}` - Delete category
+
+#### Sources
+- `POST /api/sources` - Create source
+- `PUT /api/sources/{source}` - Update source
+- `DELETE /api/sources/{source}` - Delete source
+
+#### Scraping
+- `POST /api/scrape/{source}` - Trigger manual scraping for a source
+- `GET /api/scrape/logs` - Get scraping job logs
+
+#### Dashboard
+- `GET /api/admin/stats` - Get overall statistics
+- `GET /api/admin/logs` - Get system logs
+- `GET /api/admin/articles-per-source` - Articles count per source
+- `GET /api/admin/articles-per-category` - Articles count per category
+- `GET /api/admin/recent-articles` - Get recent articles
+- `PUT /api/admin/sources/{source}/toggle` - Toggle source active status
+
+## Scraping System
+
+### Manual Scraping
+
+Trigger scraping for a specific source:
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan scrape:all
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Automated Daily Scraping
+
+The API includes a built-in scheduler that runs daily at midnight to scrape all active news sources.
+
+To enable the scheduler, add this cron job to your server:
+
+```bash
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### Adding New Sources
+
+1. Create a new scraper class in `app/Services/Scrapers/` extending `BaseScraper`
+2. Implement the `scrape()` method
+3. Add the source to the database via admin API or seeder
+4. The scraper will be automatically picked up by the scraping system
+
+## Authentication
+
+The API uses Laravel Sanctum for authentication. To access protected endpoints:
+
+1. Register or login to get an API token
+2. Include the token in the Authorization header:
+   ```
+   Authorization: Bearer {your_token}
+   ```
+
+## Rate Limiting
+
+Public endpoints are rate limited to 60 requests per minute per IP address to prevent abuse.
+
+## Testing
+
+Run the test suite:
+
+```bash
+php artisan test
+```
+
+## Project Structure
+
+```
+app/
+├── Console/
+│   └── Commands/
+│       └── ScrapeAllSourcesCommand.php
+├── Http/
+│   ├── Controllers/
+│   │   ├── Api/
+│   │   │   ├── Admin/
+│   │   │   │   └── DashboardController.php
+│   │   │   └── AuthController.php
+│   │   ├── ArticleController.php
+│   │   ├── CategoryController.php
+│   │   ├── ScrapingController.php
+│   │   └── SourceController.php
+│   └── Middleware/
+├── Jobs/
+│   └── ScrapeSourceJob.php
+├── Models/
+│   ├── Article.php
+│   ├── Category.php
+│   ├── ScrapingJob.php
+│   └── Source.php
+└── Services/
+    └── Scrapers/
+        ├── BaseScraper.php
+        ├── HespressScraper.php
+        └── HibapressScraper.php
+```
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contributions are welcome! Please follow these steps:
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Write tests for new functionality
+5. Submit a pull request
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# aggregator_api
+This project is open-sourced software licensed under the MIT license.
+
+## Support
+
+For issues, questions, or contributions, please open an issue on GitHub.
